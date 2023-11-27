@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class TransactionCategory(models.TextChoices):
@@ -25,6 +26,6 @@ class Transaction(models.Model):
         max_length=20,
         choices=TransactionCategory.choices,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(default=timezone.now)
 
     tag = models.ForeignKey("tags.Tag", models.PROTECT, related_name="transactions")
