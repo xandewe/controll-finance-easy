@@ -2,7 +2,7 @@ from django.db import models
 
 
 class TransactionCategory(models.TextChoices):
-    INCOME = "income"
+    INCOME = "Income"
     EXPENSE = "Expense"
 
 
