@@ -7,7 +7,7 @@ class CategoryChoice(models.TextChoices):
     UNDEFINED = "Undefined"
 
 
-class Transation(models.Model):
+class Transaction(models.Model):
     name = models.CharField(max_length=120)
     surname = models.CharField(
         max_length=100,
