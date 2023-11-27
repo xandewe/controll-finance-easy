@@ -5,6 +5,7 @@ from django.utils import timezone
 class TransactionCategory(models.TextChoices):
     INCOME = "Income"
     EXPENSE = "Expense"
+    CREDIT_CARD_EXPENSE = "CREDIT_CARD_EXPENSE"
 
 
 class TransactionStatus(models.TextChoices):
@@ -21,7 +22,6 @@ class Transaction(models.Model):
         choices=TransactionStatus.choices,
         default=TransactionStatus.PENDING,
     )
-    credit_card = models.BooleanField(default=True)
     category = models.CharField(
         max_length=20,
         choices=TransactionCategory.choices,
