@@ -27,4 +27,4 @@ class Transaction(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    tags = models.ManyToManyField("tags.Tag", related_name="transactions")
+    tags = models.ForeignKey("tags.Tag", models.PROTECT, related_name="transactions")
