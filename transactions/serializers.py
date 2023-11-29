@@ -15,7 +15,6 @@ class TransactionSerializer(serializers.ModelSerializer):
             "surname",
             "value",
             "status",
-            "credit_card",
             "category",
             "created_at",
             "tag",
