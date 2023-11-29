@@ -5,14 +5,14 @@ from tags.serializers import TagSerializer
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    tag = TagSerializer()
+    tag = TagSerializer(required=False)
 
     class Meta:
         model = Transaction
         fields = [
             "id",
             "name",
-            "surname",
+            "description",
             "value",
             "status",
             "category",
@@ -21,9 +21,20 @@ class TransactionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data: dict):
-        tag_data = validated_data.pop("tag")["tag_name"]
-        tag, _ = Tag.objects.get_or_create(tag_name=tag_data.title())
+        tag_data = validated_data.pop("tag", None)
+        if tag_data:
+            try:
+                tag = Tag.objects.get(sub_tag_name=tag_data["sub_tag_name"].title())
 
-        transaction = Transaction.objects.create(**validated_data, tag=tag)
+            except Tag.DoesNotExist as _:
+                tag = Tag.objects.create(
+                    tag_name=tag_data["tag_name"],
+                    sub_tag_name=tag_data["sub_tag_name"].title(),
+                )
+
+            transaction = Transaction.objects.create(**validated_data, tag=tag)
+
+        else:
+            transaction = Transaction.objects.create(**validated_data)
 
         return transaction
