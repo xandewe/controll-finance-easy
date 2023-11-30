@@ -10,10 +10,6 @@ class TransactionFilter(filters.FilterSet):
 
     class Meta:
         model = Transaction
-        # fields = [
-        #     "category",
-        #     "tag__tag_name",
-        # ]
         fields = ["category"]
 
 
