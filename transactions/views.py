@@ -7,6 +7,7 @@ from django_filters import rest_framework as filters
 class TransactionFilter(filters.FilterSet):
     category = filters.CharFilter(field_name="category", lookup_expr="iexact")
     tag = filters.CharFilter(field_name="tag__tag_name", lookup_expr="iexact")
+    status = filters.CharFilter(field_name="status", lookup_expr="iexact")
 
     class Meta:
         model = Transaction
