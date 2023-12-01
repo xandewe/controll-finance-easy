@@ -16,7 +16,7 @@ class TransactionStatus(models.TextChoices):
 class Transaction(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=100, null=True)
-    value = models.DecimalField(max_digits=5, decimal_places=2)
+    value = models.DecimalField(max_digits=7, decimal_places=2)
     status = models.CharField(
         max_length=20,
         choices=TransactionStatus.choices,
