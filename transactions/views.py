@@ -19,3 +19,8 @@ class TransactionView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = TransactionFilter
+
+
+class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
