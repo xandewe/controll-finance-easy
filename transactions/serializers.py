@@ -28,7 +28,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
             except Tag.DoesNotExist as _:
                 tag = Tag.objects.create(
-                    tag_name=tag_data["tag_name"],
+                    tag_name=tag_data["tag_name"].title(),
                     sub_tag_name=tag_data["sub_tag_name"].title(),
                 )
 
