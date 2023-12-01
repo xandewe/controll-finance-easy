@@ -38,3 +38,23 @@ class TransactionSerializer(serializers.ModelSerializer):
             transaction = Transaction.objects.create(**validated_data)
 
         return transaction
+
+    def update(self, instance: Transaction, validated_data: dict):
+        for key, value in validated_data.items():
+            if key == "tag":
+                # normalizar sub_tag_name e tag_name
+                tag = Tag.objects.filter(**value).first()
+                if tag:
+                    instance.tag = tag
+
+                else:
+                    tag = Tag.objects.create(**value)
+                    instance.tag = tag
+
+                instance.save()
+
+            else:
+                setattr(instance, key, value)
+
+        instance.save()
+        return instance
