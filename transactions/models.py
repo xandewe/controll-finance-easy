@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from django.db import models
 from django.utils import timezone
 
@@ -26,6 +27,12 @@ class Transaction(models.Model):
         max_length=20,
         choices=TransactionCategory.choices,
     )
-    created_at = models.DateField(default=timezone.now)
+    created_at = models.DateField()
 
-    tag = models.ForeignKey("tags.Tag", models.PROTECT, related_name="transactions", null=True)
+    tag = models.ForeignKey(
+        "tags.Tag", models.PROTECT, related_name="transactions", null=True
+    )
+
+    # def save(self, *args, **kwargs) -> None:
+    #     self.created_at.strftime("%d/%m/%Y")
+    #     return super().save(*args, **kwargs)
