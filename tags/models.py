@@ -18,4 +18,4 @@ class Tag(models.Model):
         max_length=70,
         choices=TagName.choices,
     )
-    sub_tag_name = models.CharField(max_length=100, unique=True)
+    sub_tag_name = models.CharField(max_length=100)
