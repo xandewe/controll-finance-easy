@@ -14,6 +14,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file_csv = os.path.join("./package_csv", options["file_csv"])
 
+        counter = 0
+
         if os.path.exists(file_csv):
             with open(file_csv, "r", encoding="utf-8") as file:
                 reader = csv.reader(file)
@@ -23,7 +25,9 @@ class Command(BaseCommand):
                         line.pop(2)
                         data = dict(zip(fields, line))
                         data["value"] = Decimal(data["value"])
-                        data["created_at"] = "-".join(data["created_at"].split('/')[::-1])
+                        data["created_at"] = "-".join(
+                            data["created_at"].split("/")[::-1]
+                        )
 
                         if data["value"] < 0:
                             data.update({"category": "Expense"})
@@ -31,13 +35,19 @@ class Command(BaseCommand):
                         else:
                             data.update({"category": "Income"})
 
+                        data.update({"status": "Done"})
+
                         Transaction.objects.create(**data)
 
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f"Dados processados para o DB com sucesso"
-                            )
-                        )
+                        counter += 1
+
+                        self.stdout.write(self.style.SUCCESS(f"Processando ..."))
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"{counter} dados processados para o DB com sucesso"
+                    )
+                )
 
         else:
             self.stdout.write(
