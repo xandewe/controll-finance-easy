@@ -30,10 +30,10 @@ class Command(BaseCommand):
                         )
 
                         if data["value"] < 0:
-                            data.update({"category": "Expense"})
+                            data.update({"type": "Expense"})
                             data["value"] = -1 * data["value"]
                         else:
-                            data.update({"category": "Income"})
+                            data.update({"type": "Income"})
 
                         data.update({"status": "Done"})
 
