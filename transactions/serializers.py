@@ -15,7 +15,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             "description",
             "value",
             "status",
-            "category",
+            "type",
             "created_at",
             "tag",
         ]
