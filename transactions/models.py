@@ -29,7 +29,7 @@ class Transaction(models.Model):
     created_at = models.DateField()
 
     tag = models.ForeignKey(
-        "tags.Tag", models.CASCADE, related_name="transactions", null=True
+        "tags.Tag", models.SET_NULL, related_name="transactions", null=True
     )
 
     # def save(self, *args, **kwargs) -> None:
