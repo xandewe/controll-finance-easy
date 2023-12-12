@@ -2,10 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 
-class TransactionCategory(models.TextChoices):
+class TransactionType(models.TextChoices):
     INCOME = "Income"
     EXPENSE = "Expense"
-    CREDIT_CARD_EXPENSE = "CREDIT_CARD_EXPENSE"
+    CREDIT_CARD = "Credit Card"
 
 
 class TransactionStatus(models.TextChoices):
@@ -22,9 +22,9 @@ class Transaction(models.Model):
         choices=TransactionStatus.choices,
         default=TransactionStatus.PENDING,
     )
-    category = models.CharField(
+    type = models.CharField(
         max_length=20,
-        choices=TransactionCategory.choices,
+        choices=TransactionType.choices,
     )
     created_at = models.DateField()
 
