@@ -43,12 +43,18 @@ class TransactionSerializer(serializers.ModelSerializer):
         for key, value in validated_data.items():
             if key == "tag":
                 # normalizar sub_tag_name e tag_name
-                tag = Tag.objects.filter(**value).first()
+                tag = Tag.objects.filter(
+                    tag_name=value["tag_name"].title(),
+                    sub_tag_name=value["sub_tag_name"].title(),
+                ).first()
                 if tag:
                     instance.tag = tag
 
                 else:
-                    tag = Tag.objects.create(**value)
+                    tag = Tag.objects.create(
+                        tag_name=value["tag_name"].title(),
+                        sub_tag_name=value["sub_tag_name"].title(),
+                    )
                     instance.tag = tag
 
                 instance.save()
