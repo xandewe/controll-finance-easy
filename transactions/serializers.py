@@ -42,7 +42,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     def update(self, instance: Transaction, validated_data: dict):
         for key, value in validated_data.items():
             if key == "tag":
-                # normalizar sub_tag_name e tag_name
                 tag = Tag.objects.filter(
                     tag_name=value["tag_name"].title(),
                     sub_tag_name=value["sub_tag_name"].title(),
