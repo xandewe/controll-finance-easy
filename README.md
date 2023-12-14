@@ -4,4 +4,4 @@ Esta é uma API pensada para o controle financeiro de uma pessoa (CPF), onde o o
 
 ## Comandos CLI personalizado
 
-- `python manage.py populate <nome_arquivo.csv>` - Crie uma pasta chamada ***package_csv*** (obrigatoriamente esse nome) e jogue seu arquivo **CSV**. Definido o nome basta adiciona-lo ao final do comando juntamente com **.csv**. EX:  `python manage.py populate NU_NOV_2023.csv`
+- `python manage.py populate <nome_arquivo.csv>` - Crie uma pasta chamada ***package_csv*** (obrigatoriamente esse nome) e jogue seu arquivo **CSV**. Definido o nome basta adiciona-lo ao final do comando juntamente com **.csv**. EX:  `python manage.py populate NU_NOV_2023.csv` (Funciona apenas para csv gerado pelo Nubank).
