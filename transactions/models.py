@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 
 class TransactionType(models.TextChoices):
@@ -31,7 +30,3 @@ class Transaction(models.Model):
     tag = models.ForeignKey(
         "tags.Tag", models.SET_NULL, related_name="transactions", null=True
     )
-
-    # def save(self, *args, **kwargs) -> None:
-    #     self.created_at.strftime("%d/%m/%Y")
-    #     return super().save(*args, **kwargs)
