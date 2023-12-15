@@ -63,7 +63,7 @@ class Command(BaseCommand):
                                 _, year, month = file_csv.split("-")
                                 data.update({"created_at": f"{year}-{month}-01"})
 
-                                # Transaction.objects.create(**data)
+                                Transaction.objects.create(**data)
 
                                 counter += 1
 
