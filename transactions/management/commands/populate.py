@@ -18,6 +18,7 @@ class Command(BaseCommand):
         is_credit = options["is_credit"]
 
         counter = 0
+        counter_payment = 0
 
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as file:
@@ -62,14 +63,24 @@ class Command(BaseCommand):
                                 _, year, month = file_csv.split("-")
                                 data.update({"created_at": f"{year}-{month}-01"})
 
-                                Transaction.objects.create(**data)
+                                # Transaction.objects.create(**data)
 
-                        self.stdout.write(self.style.SUCCESS(f"Processando ..."))
-                        counter += 1
+                                counter += 1
+
+                            else:
+                                counter_payment += 1
+                        self.stdout.write(self.style.WARNING(f"Processando ..."))
+
+                if is_credit == "others":
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"\n{counter} dados processados para o DB com sucesso"
+                        )
+                    )
 
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"{counter} dados processados para o DB com sucesso"
+                        f"\n{counter+counter_payment} dados processados para o DB com sucesso\n{counter_payment} dados de pagamento\n{counter} dados de saída"
                     )
                 )
 
