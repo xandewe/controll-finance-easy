@@ -46,6 +46,8 @@ class Command(BaseCommand):
 
                             Transaction.objects.create(**data)
 
+                            counter += 1
+
                         else:
                             if line[1] != "payment":
                                 fields = ["description", "name", "value"]
@@ -78,11 +80,12 @@ class Command(BaseCommand):
                         )
                     )
 
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"\n{counter+counter_payment} dados processados para o DB com sucesso\n{counter_payment} dados de pagamento\n{counter} dados de saída"
+                else:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"\n{counter+counter_payment} dados processados para o DB com sucesso\n{counter_payment} dados de pagamento\n{counter} dados de saída"
+                        )
                     )
-                )
 
         else:
             self.stdout.write(
