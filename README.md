@@ -1,6 +1,6 @@
 # CONTROL FINANCE EASY
 
-Esta é uma API pensada para o controle financeiro de uma pessoa (CPF), onde o objetivo é facilitar a vida financeira, permitindo que você esteja ciente de tudo o que está entrando e saindo do seu bolso.
+Esta é uma API pensada para o controle financeiro de uma pessoa (CPF), onde o objetivo é facilitar a vida financeira, permitindo que você esteja ciente de tudo o que está entrando e saindo do seu bolso. Para ajudar no entendimento da API aqui está o link para o DER [link referência](https://dbdiagram.io/d/Controll-Easy-Finance-60e0e40f0b1d8a6d39657fc5).
 
 ## Comandos CLI personalizado
 
@@ -9,6 +9,17 @@ Esta é uma API pensada para o controle financeiro de uma pessoa (CPF), onde o o
 > [!IMPORTANT]
 > Caso a opção do tipo seja o ***credit*** o nome do arquivo deve nesse formato ***nubank-ano-mes***. EX: `python manage.py populate nubank-2023-01 credit`
 
-## DER
+## Tecnologias utilizadas
 
-[Link referência](https://dbdiagram.io/d/Controll-Easy-Finance-60e0e40f0b1d8a6d39657fc5)
+- Python
+- Django
+- DRF (Django rest framework)
+- Django-filter
+- Ferramenta para manipulção de CSV
+
+## Instalação
+
+Certifique-se de ter o Python e as dependências necessárias instaladas. Você pode instalar as dependências usando o seguinte comando:
+
+```bash
+pip install -r requirements.txt
