@@ -1,7 +1,9 @@
 from rest_framework import generics
+from rest_framework.views import APIView, Response, Request, status
 from .serializers import TransactionSerializer
 from .models import Transaction
 from django_filters import rest_framework as filters
+from django.shortcuts import get_object_or_404
 
 
 class CustomDateFilter(filters.DateFilter):
@@ -37,3 +39,13 @@ class TransactionView(generics.ListCreateAPIView):
 class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
+
+class TransactionTagDeleteView(APIView):
+    def delete(self, request: Request, pk):
+        transaction_queryset = get_object_or_404(Transaction, pk=pk)
+
+        transaction_queryset.tag = None
+        transaction_queryset.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
