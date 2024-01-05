@@ -7,7 +7,7 @@ import random
 
 class TransactionListCreateViewTest(APITestCase):
     """
-    Classe desenvolvida para testagitr criação e listagem de transações
+    Classe desenvolvida para testar criação e listagem de transações
     """
 
     @classmethod
