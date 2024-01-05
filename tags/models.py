@@ -14,6 +14,9 @@ class TagName(models.TextChoices):
 
 
 class Tag(models.Model):
+    class Meta:
+        ordering = ["id"]
+    
     tag_name = models.CharField(
         max_length=70,
         choices=TagName.choices,
