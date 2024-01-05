@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework.views import status
+from django.urls import reverse
 from faker import Faker
 from .models import Transaction
 import random
@@ -10,15 +11,11 @@ class TransactionListCreateViewTest(APITestCase):
     Classe desenvolvida para testar criação e listagem de transações
     """
 
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.BASE_URL = "/api/transactions/"
-
     def setUp(self):
         fake = Faker()
 
         for _ in range(2):
-            date = fake.date_this_month().strftime('%Y-%m-%d')
+            date = fake.date_this_month().strftime("%Y-%m-%d")
 
             Transaction.objects.create(
                 name=f"Transferência Recebida - {fake.name()}",
@@ -29,7 +26,7 @@ class TransactionListCreateViewTest(APITestCase):
             )
 
         for _ in range(2):
-            date = fake.date_this_month().strftime('%Y-%m-%d')
+            date = fake.date_this_month().strftime("%Y-%m-%d")
 
             Transaction.objects.create(
                 name=f"Transferência enviada pelo Pix - {fake.name()}",
@@ -41,6 +38,8 @@ class TransactionListCreateViewTest(APITestCase):
         ...
 
     def test_income_transaction_creation_success(self):
+        URL = reverse("transaction-list-create")
+
         transaction_data = {
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
             "description": "investimento",
@@ -50,7 +49,7 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
         }
 
-        response = self.client.post(self.BASE_URL, transaction_data, format="json")
+        response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
             "id": 5,
@@ -74,7 +73,9 @@ class TransactionListCreateViewTest(APITestCase):
         self.assertEqual(expected_data, response.json(), msg)
 
     def test_transaction_creation_without_required_fields(self):
-        response = self.client.post(self.BASE_URL, data={}, format="json")
+        URL = reverse("transaction-list-create")
+
+        response = self.client.post(URL, data={}, format="json")
 
         expected_data = {
             "name": ["This field is required."],
@@ -94,6 +95,8 @@ class TransactionListCreateViewTest(APITestCase):
         self.assertEqual(expected_data, response.json(), msg)
 
     def test_transaction_creation_with_field_status_invalid(self):
+        URL = reverse("transaction-list-create")
+
         transaction_data = {
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
             "description": "investimento",
@@ -104,7 +107,7 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
         }
 
-        response = self.client.post(self.BASE_URL, transaction_data, format="json")
+        response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
             "status": ['"Other" is not a valid choice.'],
@@ -121,6 +124,8 @@ class TransactionListCreateViewTest(APITestCase):
         self.assertEqual(expected_data, response.json(), msg)
 
     def test_transaction_creation_with_field_type_invalid(self):
+        URL = reverse("transaction-list-create")
+
         transaction_data = {
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
             "description": "investimento",
@@ -131,7 +136,7 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
         }
 
-        response = self.client.post(self.BASE_URL, transaction_data, format="json")
+        response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
             "type": ['"Other" is not a valid choice.'],
@@ -148,6 +153,8 @@ class TransactionListCreateViewTest(APITestCase):
         self.assertEqual(expected_data, response.json(), msg)
 
     def test_transaction_creation_with_field_tag_name_invalid(self):
+        URL = reverse("transaction-list-create")
+
         transaction_data = {
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
             "description": "investimento",
@@ -158,7 +165,7 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
         }
 
-        response = self.client.post(self.BASE_URL, transaction_data, format="json")
+        response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
             "tag": {"tag_name": ['"alimento" is not a valid choice.']},
@@ -175,7 +182,9 @@ class TransactionListCreateViewTest(APITestCase):
         self.assertEqual(expected_data, response.json(), msg)
 
     def test_transaction_list(self):
-        response = self.client.get(self.BASE_URL)
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL)
 
         expected_status_code = status.HTTP_200_OK
 
