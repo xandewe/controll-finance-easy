@@ -13,6 +13,9 @@ class TransactionStatus(models.TextChoices):
 
 
 class Transaction(models.Model):
+    class Meta:
+        ordering = ["id"]
+
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=100, null=True, blank=True)
     value = models.DecimalField(max_digits=7, decimal_places=2)
