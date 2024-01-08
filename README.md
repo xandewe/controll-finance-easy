@@ -14,6 +14,7 @@ A documentação completa da API Controll Finance Easy está disponível no endp
 - Drf-spectacular
 - Django-filter
 - Ferramenta para manipulção de CSV
+- Psycopg2-binary
 
 ## Instalação
 
