@@ -22,11 +22,11 @@ class TransactionFilter(filters.FilterSet):
     tag = filters.CharFilter(field_name="tag__tag_name", lookup_expr="iexact")
     sub_tag = filters.CharFilter(field_name="tag__sub_tag_name", lookup_expr="iexact")
     status = filters.CharFilter(field_name="status", lookup_expr="iexact")
-    created_at = CustomDateFilter(field_name="created_at")
+    year_month = filters.CharFilter(field_name="year_month_reference", lookup_expr="exact")
 
     class Meta:
         model = Transaction
-        fields = ["type", "tag", "status", "created_at"]
+        fields = ["type", "tag", "status", "year_month_reference"]
 
 
 class TransactionView(generics.ListCreateAPIView):
