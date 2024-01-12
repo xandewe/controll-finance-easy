@@ -42,7 +42,9 @@ class Command(BaseCommand):
                             else:
                                 data.update({"type": "Income"})
 
-                            data.update({"status": "Done"})
+                            year_month_reference = data["created_at"][:-3]
+
+                            data.update({"status": "Done", "year_month_reference": year_month_reference})
 
                             Transaction.objects.create(**data)
 
@@ -50,20 +52,16 @@ class Command(BaseCommand):
 
                         else:
                             if line[1] != "payment":
-                                fields = ["description", "name", "value"]
-                                date_purchase = line.pop(0)
+                                fields = ["created_at", "description", "name", "value"]
 
                                 data = dict(zip(fields, line))
+                                
                                 data["value"] = Decimal(data["value"])
-                                data.update(
-                                    {
-                                        "description": f'{date_purchase} {data["description"]}'
-                                    }
-                                )
                                 data.update({"type": "Credit Card"})
                                 data.update({"status": "Done"})
+
                                 _, year, month = file_csv.split("-")
-                                data.update({"created_at": f"{year}-{month}-01"})
+                                data.update({"year_month_reference": f"{year}-{month}"})
 
                                 Transaction.objects.create(**data)
 
@@ -71,6 +69,7 @@ class Command(BaseCommand):
 
                             else:
                                 counter_payment += 1
+                                
                         self.stdout.write(self.style.WARNING(f"Processando ..."))
 
                 if is_credit == "others":
