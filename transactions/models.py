@@ -29,6 +29,7 @@ class Transaction(models.Model):
         choices=TransactionType.choices,
     )
     created_at = models.DateField()
+    year_month_reference = models.CharField(max_length=7)
 
     tag = models.ForeignKey(
         "tags.Tag", models.SET_NULL, related_name="transactions", null=True
