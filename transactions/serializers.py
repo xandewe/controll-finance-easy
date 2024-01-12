@@ -2,10 +2,12 @@ from rest_framework import serializers
 from .models import Transaction
 from tags.models import Tag
 from tags.serializers import TagSerializer
+from datetime import datetime
 
 
 class TransactionSerializer(serializers.ModelSerializer):
     tag = TagSerializer(required=False)
+    year_month_reference = serializers.CharField(write_only=True)
 
     class Meta:
         model = Transaction
@@ -18,9 +20,13 @@ class TransactionSerializer(serializers.ModelSerializer):
             "type",
             "created_at",
             "tag",
+            "year_month_reference",
         ]
 
     def create(self, validated_data: dict):
+        validate_date = datetime.strptime(validated_data["year_month_reference"], "%Y-%m").date()
+        validated_data["year_month_reference"] = validate_date.strftime("%Y-%m")
+
         tag_data = validated_data.pop("tag", None)
         if tag_data:
             try:
@@ -36,6 +42,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         else:
             transaction = Transaction.objects.create(**validated_data)
+
 
         return transaction
 
