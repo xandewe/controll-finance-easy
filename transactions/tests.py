@@ -15,25 +15,34 @@ class TransactionListCreateViewTest(APITestCase):
         fake = Faker()
 
         for _ in range(2):
-            date = fake.date_this_month().strftime("%Y-%m-%d")
-
             Transaction.objects.create(
                 name=f"Transferência Recebida - {fake.name()}",
                 value=round(random.uniform(1, 1000), 2),
                 status="Done",
                 type="Income",
-                created_at=date,
+                created_at="2024-01-10",
+                year_month_reference="2024-01",
             )
 
+        month = 1
         for _ in range(2):
-            date = fake.date_this_month().strftime("%Y-%m-%d")
-
             Transaction.objects.create(
                 name=f"Transferência enviada pelo Pix - {fake.name()}",
                 value=round(random.uniform(1, 1000), 2),
                 status="Done",
-                type="Income",
-                created_at=date,
+                type="Expense",
+                created_at=f"2024-{month}-10",
+                year_month_reference=f"2024-{month}",
+            )
+
+        for _ in range(2):
+            Transaction.objects.create(
+                name=f"Ifood",
+                value=round(random.uniform(1, 1000), 2),
+                status="Pending",
+                type="Credit Card",
+                created_at="2024-02-10",
+                year_month_reference="2024-02",
             )
 
     def test_income_transaction_creation_success(self):
@@ -46,12 +55,13 @@ class TransactionListCreateViewTest(APITestCase):
             "status": "Done",
             "type": "Income",
             "created_at": "2023-01-09",
+            "year_month_reference": "2023-01",
         }
 
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
-            "id": 5,
+            "id": 7,
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
             "description": "investimento",
             "value": "107.19",
@@ -81,6 +91,7 @@ class TransactionListCreateViewTest(APITestCase):
             "value": ["This field is required."],
             "type": ["This field is required."],
             "created_at": ["This field is required."],
+            "year_month_reference": ["This field is required."],
         }
 
         expected_status_code = status.HTTP_400_BAD_REQUEST
@@ -104,6 +115,7 @@ class TransactionListCreateViewTest(APITestCase):
             "tag": {"tag_name": "Alimentacao", "sub_tag_name": "mercado"},
             "type": "Income",
             "created_at": "2023-01-09",
+            "year_month_reference": "2023-01",
         }
 
         response = self.client.post(URL, transaction_data, format="json")
@@ -133,6 +145,7 @@ class TransactionListCreateViewTest(APITestCase):
             "tag": {"tag_name": "Alimentacao", "sub_tag_name": "mercado"},
             "type": "Other",
             "created_at": "2023-01-09",
+            "year_month_reference": "2023-01",
         }
 
         response = self.client.post(URL, transaction_data, format="json")
@@ -162,6 +175,7 @@ class TransactionListCreateViewTest(APITestCase):
             "tag": {"tag_name": "alimento", "sub_tag_name": "mercado"},
             "type": "Income",
             "created_at": "2023-01-09",
+            "year_month_reference": "2023-01",
         }
 
         response = self.client.post(URL, transaction_data, format="json")
@@ -198,11 +212,36 @@ class TransactionListCreateViewTest(APITestCase):
             self.assertIn(expected_key, response.json().keys(), msg)
 
         results_len = len(response.json()["results"])
-        expected_len = 4
+        expected_len = 6
+
+        msg = "Verifique se a paginação está retornando apenas seis items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+
+    def test_transaction_list_filtered_with_type(self):
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL, QUERY_STRING="type=Expense")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        results_len = len(response.json()["results"])
+        expected_len = 2
 
         msg = "Verifique se a paginação está retornando apenas quatro items de cada vez"
 
         self.assertEqual(expected_len, results_len, msg)
+
+        expected_type = "Expense"
+        msg = f"Verifique se está sendo feito a filtragem do 'type' corretamente"
+
+        for transaction in response.json()["results"]:
+            result_type = transaction["type"]
+            self.assertEqual(expected_type, result_type, msg)
 
 
 class TransactionDetailViewTest(APITestCase):
@@ -269,7 +308,7 @@ class TransactionDetailViewTest(APITestCase):
 
         self.assertEqual(expected_data, response.json(), msg)
 
-    def test_get_transaction_by_id_invalid(self):  
+    def test_get_transaction_by_id_invalid(self):
         URL = reverse("transaction-detail", kwargs={"pk": 100})
 
         response = self.client.get(URL)
@@ -280,14 +319,12 @@ class TransactionDetailViewTest(APITestCase):
 
         self.assertEqual(expected_status_code, response.status_code, msg)
 
-        expected_data = {
-            "detail": "Not found."
-        }
+        expected_data = {"detail": "Not found."}
 
         msg = "Verifique se está retornando a mensagem de erro correta"
 
         self.assertEqual(expected_data, response.json(), msg)
-    
+
     def test_delete_transaction_by_id_success(self):
         transaction = Transaction.objects.create(
             name=f"Transferência Recebida - Guido Van Rossum",
@@ -324,9 +361,7 @@ class TransactionDetailViewTest(APITestCase):
 
         self.assertEqual(expected_status_code, response.status_code, msg)
 
-        expected_data = {
-            "detail": "Not found."
-        }
+        expected_data = {"detail": "Not found."}
 
         msg = "Verifique se está retornando a mensagem de erro correta"
 
@@ -346,7 +381,7 @@ class TransactionDetailViewTest(APITestCase):
         transaction_data = {
             "name": "Transferência Recebida - Guido Van Rossum",
             "description": "freela",
-            "value": 1300.50
+            "value": 1300.50,
         }
 
         response = self.client.patch(URL, transaction_data, format="json")
@@ -383,9 +418,7 @@ class TransactionDetailViewTest(APITestCase):
 
         self.assertEqual(expected_status_code, response.status_code, msg)
 
-        expected_data = {
-            "detail": "Not found."
-        }
+        expected_data = {"detail": "Not found."}
 
         msg = "Verifique se está retornando a mensagem de erro correta"
 
