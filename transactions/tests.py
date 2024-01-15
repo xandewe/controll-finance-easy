@@ -24,15 +24,14 @@ class TransactionListCreateViewTest(APITestCase):
                 year_month_reference="2024-01",
             )
 
-        month = 1
         for _ in range(2):
             Transaction.objects.create(
                 name=f"Transferência enviada pelo Pix - {fake.name()}",
                 value=round(random.uniform(1, 1000), 2),
                 status="Done",
                 type="Expense",
-                created_at=f"2024-{month}-10",
-                year_month_reference=f"2024-{month}",
+                created_at=f"2024-02-10",
+                year_month_reference=f"2024-02",
             )
 
         for _ in range(2):
@@ -211,7 +210,7 @@ class TransactionListCreateViewTest(APITestCase):
         for expected_key in expected_pagination_keys:
             self.assertIn(expected_key, response.json().keys(), msg)
 
-        results_len = len(response.json()["results"])
+        results_len = response.json()["count"]
         expected_len = 6
 
         msg = "Verifique se a paginação está retornando apenas seis items de cada vez"
@@ -229,10 +228,10 @@ class TransactionListCreateViewTest(APITestCase):
 
         self.assertEqual(expected_status_code, response.status_code, msg)
 
-        results_len = len(response.json()["results"])
+        results_len = response.json()["count"]
         expected_len = 2
 
-        msg = "Verifique se a paginação está retornando apenas quatro items de cada vez"
+        msg = "Verifique se a paginação está retornando apenas dois items de cada vez"
 
         self.assertEqual(expected_len, results_len, msg)
 
@@ -242,6 +241,55 @@ class TransactionListCreateViewTest(APITestCase):
         for transaction in response.json()["results"]:
             result_type = transaction["type"]
             self.assertEqual(expected_type, result_type, msg)
+
+    def test_transaction_list_filtered_with_status(self):
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL, QUERY_STRING="status=Done")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        results_len = response.json()["count"]
+        expected_len = 4
+
+        msg = "Verifique se a paginação está retornando apenas quatro items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+
+        expected_status = "Done"
+        msg = f"Verifique se está sendo feito a filtragem do 'status' corretamente"
+
+        for transaction in response.json()["results"]:
+            result_type = transaction["status"]
+            self.assertEqual(expected_status, result_type, msg)
+
+    def test_transaction_list_filtered_with_year_month(self):
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL, QUERY_STRING="year_month=2024-02")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        results_len = response.json()["count"]
+        expected_len = 4
+
+        msg = "Verifique se a paginação está retornando apenas três items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+        expected_date = "2024-02"
+        msg = f"Verifique se está sendo feito a filtragem de 'year_month' corretamente"
+
+        for transaction in response.json()["results"]:
+            result_type = transaction["created_at"]
+            self.assertIn(expected_date, result_type, msg)
 
 
 class TransactionDetailViewTest(APITestCase):
