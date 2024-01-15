@@ -3,6 +3,7 @@ from rest_framework.views import status
 from django.urls import reverse
 from faker import Faker
 from .models import Transaction
+from tags.models import Tag
 import random
 
 
@@ -13,6 +14,9 @@ class TransactionListCreateViewTest(APITestCase):
 
     def setUp(self):
         fake = Faker()
+
+        tag1 = Tag.objects.create(tag_name="Alimentacao", sub_tag_name="ifood")
+        tag2 = Tag.objects.create(tag_name="Saude", sub_tag_name="academia")
 
         for _ in range(2):
             Transaction.objects.create(
@@ -32,6 +36,7 @@ class TransactionListCreateViewTest(APITestCase):
                 type="Expense",
                 created_at=f"2024-02-10",
                 year_month_reference=f"2024-02",
+                tag=tag2,
             )
 
         for _ in range(2):
@@ -42,6 +47,7 @@ class TransactionListCreateViewTest(APITestCase):
                 type="Credit Card",
                 created_at="2024-02-10",
                 year_month_reference="2024-02",
+                tag=tag1,
             )
 
     def test_income_transaction_creation_success(self):
@@ -264,8 +270,8 @@ class TransactionListCreateViewTest(APITestCase):
         msg = f"Verifique se está sendo feito a filtragem do 'status' corretamente"
 
         for transaction in response.json()["results"]:
-            result_type = transaction["status"]
-            self.assertEqual(expected_status, result_type, msg)
+            result_status = transaction["status"]
+            self.assertEqual(expected_status, result_status, msg)
 
     def test_transaction_list_filtered_with_year_month(self):
         URL = reverse("transaction-list-create")
@@ -288,8 +294,58 @@ class TransactionListCreateViewTest(APITestCase):
         msg = f"Verifique se está sendo feito a filtragem de 'year_month' corretamente"
 
         for transaction in response.json()["results"]:
-            result_type = transaction["created_at"]
-            self.assertIn(expected_date, result_type, msg)
+            result_date = transaction["created_at"]
+            self.assertIn(expected_date, result_date, msg)
+
+    def test_transaction_list_filtered_with_tag_name(self):
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL, QUERY_STRING="tag=Alimentacao")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        results_len = response.json()["count"]
+        expected_len = 2
+
+        msg = "Verifique se a paginação está retornando apenas dois items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+        expected_tag = "Alimentacao"
+        msg = f"Verifique se está sendo feito a filtragem de 'tag_name' corretamente"
+
+        for transaction in response.json()["results"]:
+            result_tag = transaction["tag"]["tag_name"]
+            self.assertEqual(expected_tag, result_tag, msg)
+
+    def test_transaction_list_filtered_with_sub_tag_name(self):
+        URL = reverse("transaction-list-create")
+
+        response = self.client.get(URL, QUERY_STRING="sub_tag=academia")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        results_len = response.json()["count"]
+        expected_len = 2
+
+        msg = "Verifique se a paginação está retornando apenas dois items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+        expected_sub_tag = "academia"
+        msg = (
+            f"Verifique se está sendo feito a filtragem de 'sub_tag_name' corretamente"
+        )
+
+        for transaction in response.json()["results"]:
+            result_sub_tag = transaction["tag"]["sub_tag_name"]
+            self.assertEqual(expected_sub_tag, result_sub_tag, msg)
 
 
 class TransactionDetailViewTest(APITestCase):
