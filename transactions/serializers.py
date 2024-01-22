@@ -24,9 +24,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data: dict):
-        validate_date = datetime.strptime(validated_data["year_month_reference"], "%Y-%m").date()
-        validated_data["year_month_reference"] = validate_date.strftime("%Y-%m")
-
         tag_data = validated_data.pop("tag", None)
         if tag_data:
             try:
@@ -70,3 +67,11 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+    def validate_year_month_reference(self, value):
+        try:
+            datetime.strptime(value, "%Y-%m").date()
+        except ValueError:
+            raise serializers.ValidationError(f"Invalid date format ({value}) must have the following pattern YYYY-mm")
+        
+        return value
