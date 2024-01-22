@@ -86,6 +86,35 @@ class TransactionListCreateViewTest(APITestCase):
 
         self.assertEqual(expected_data, response.json(), msg)
 
+    def test_income_transaction_creation_with_year_month_reference_invalid(self):
+        URL = reverse("transaction-list-create")
+
+        transaction_data = {
+            "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
+            "description": "investimento",
+            "value": 107.19,
+            "status": "Done",
+            "type": "Income",
+            "created_at": "2023-01-09",
+            "year_month_reference": "2023",
+        }
+
+        response = self.client.post(URL, transaction_data, format="json")
+
+        expected_data = {
+            "year_month_reference": [f"Invalid date format (2023) must have the following pattern YYYY-mm"]
+        }
+
+        expected_status_code = status.HTTP_400_BAD_REQUEST
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        msg = f"Verifique se as informações de retorno de transações estão de acordo"
+
+        self.assertEqual(expected_data, response.json(), msg)
+
     def test_transaction_creation_without_required_fields(self):
         URL = reverse("transaction-list-create")
 
