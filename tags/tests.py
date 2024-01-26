@@ -55,7 +55,7 @@ class TagCreateViewTest(APITestCase):
     Classe desenvolvida para testar criação de tags
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         fake = Faker()
 
         tag1 = Tag.objects.create(tag_name="Saude", sub_tag_name="academia")
@@ -146,4 +146,68 @@ class TagCreateViewTest(APITestCase):
 
 
 class TagDetailViewTest(APITestCase):
-    ...
+    """
+    Classe desenvolvida para testar atualização de tags
+    """
+
+    def setUp(self) -> None:
+        fake = Faker()
+
+        tag1 = Tag.objects.create(tag_name="Saude", sub_tag_name="academia")
+
+        Transaction.objects.create(
+            name=f"Transferência enviada pelo Pix - {fake.name()}",
+            value=round(random.uniform(1, 1000), 2),
+            status="Done",
+            type="Expense",
+            created_at=f"2024-02-10",
+            year_month_reference=f"2024-02",
+            tag=tag1,
+        )
+
+    def test_update_tag_by_id_success(self):
+        transaction = Tag.objects.create(
+            tag_name="Assinaturas",
+            sub_tag_name="Amaonz",
+        )
+
+        URL = reverse("tag-detail", kwargs={"pk": transaction.pk})
+
+        transaction_data = {
+            "sub_tag_name": "amazon",
+        }
+
+        response = self.client.patch(URL, transaction_data, format="json")
+
+        expected_data = {
+            "id": transaction.pk,
+            "tag_name": "Assinaturas",
+            "sub_tag_name": "amazon",
+        }
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado {expected_status_code}"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        msg = f"Verifique se as informações de retorno de transações estão de acordo"
+
+        self.assertEqual(expected_data, response.json(), msg)
+
+    def test_update_tag_by_id_invalid(self):
+        URL = reverse("tag-detail", kwargs={"pk": 100})
+
+        response = self.client.patch(URL)
+
+        expected_status_code = status.HTTP_404_NOT_FOUND
+
+        msg = f"Verifique se o status code está conforme o solicitado {expected_status_code}"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {"detail": "Not found."}
+
+        msg = "Verifique se está retornando a mensagem de erro correta"
+
+        self.assertEqual(expected_data, response.json(), msg)
