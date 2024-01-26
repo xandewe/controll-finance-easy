@@ -40,23 +40,22 @@ class TransactionSerializer(serializers.ModelSerializer):
         else:
             transaction = Transaction.objects.create(**validated_data)
 
-
         return transaction
 
     def update(self, instance: Transaction, validated_data: dict):
         for key, value in validated_data.items():
             if key == "tag":
                 tag = Tag.objects.filter(
-                    tag_name=value["tag_name"].title(),
-                    sub_tag_name=value["sub_tag_name"].title(),
+                    tag_name=value["tag_name"],
+                    sub_tag_name=value["sub_tag_name"],
                 ).first()
                 if tag:
                     instance.tag = tag
 
                 else:
                     tag = Tag.objects.create(
-                        tag_name=value["tag_name"].title(),
-                        sub_tag_name=value["sub_tag_name"].title(),
+                        tag_name=value["tag_name"],
+                        sub_tag_name=value["sub_tag_name"],
                     )
                     instance.tag = tag
 
@@ -67,11 +66,13 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-    
+
     def validate_year_month_reference(self, value):
         try:
             datetime.strptime(value, "%Y-%m").date()
         except ValueError:
-            raise serializers.ValidationError(f"Invalid date format ({value}) must have the following pattern YYYY-mm")
-        
+            raise serializers.ValidationError(
+                f"Invalid date format ({value}) must have the following pattern YYYY-mm"
+            )
+
         return value
