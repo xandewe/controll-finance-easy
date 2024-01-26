@@ -102,7 +102,9 @@ class TransactionListCreateViewTest(APITestCase):
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
-            "year_month_reference": [f"Invalid date format (2023) must have the following pattern YYYY-mm"]
+            "year_month_reference": [
+                f"Invalid date format (2023) must have the following pattern YYYY-mm"
+            ]
         }
 
         expected_status_code = status.HTTP_400_BAD_REQUEST
@@ -251,6 +253,24 @@ class TransactionListCreateViewTest(APITestCase):
         msg = "Verifique se a paginação está retornando apenas seis items de cada vez"
 
         self.assertEqual(expected_len, results_len, msg)
+
+        expected_keys = {
+            "id",
+            "name",
+            "description",
+            "value",
+            "status",
+            "type",
+            "created_at",
+            "tag",
+        }
+
+        msg = f"Verifique se o serializer foi configurado para retornar os campos corretamente"
+
+        for key in expected_keys:
+            first_data = response.json()["results"][0].keys()
+
+            self.assertIn(key, first_data, msg)
 
     def test_transaction_list_filtered_with_type(self):
         URL = reverse("transaction-list-create")
