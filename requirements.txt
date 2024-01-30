@@ -10,6 +10,7 @@ decorator==5.1.1
 Django==4.2.7
 django-filter==23.4
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
 drf-spectacular==0.27.0
 executing==1.2.0
 Faker==22.0.0
@@ -32,6 +33,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
 pyasn1==0.5.0
 Pygments==2.16.1
+PyJWT==2.8.0
 pyparsing==3.1.1
 python-dateutil==2.8.2
 python-dotenv==1.0.0
