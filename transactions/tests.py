@@ -5,6 +5,10 @@ from faker import Faker
 from .models import Transaction
 from tags.models import Tag
 import random
+from django.contrib.auth.models import User as UserType
+from django.contrib.auth import get_user_model
+
+User: UserType = get_user_model()
 
 
 class TransactionListCreateViewTest(APITestCase):
@@ -14,6 +18,16 @@ class TransactionListCreateViewTest(APITestCase):
 
     def setUp(self):
         fake = Faker()
+
+        default_user_data = {
+            "username": "socrates",
+            "email": fake.unique.email(),
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
+            "password": "socrates123",
+        }
+
+        user = User.objects.create_user(**default_user_data)
 
         tag1 = Tag.objects.create(tag_name="Alimentacao", sub_tag_name="ifood")
         tag2 = Tag.objects.create(tag_name="Saude", sub_tag_name="academia")
@@ -26,6 +40,7 @@ class TransactionListCreateViewTest(APITestCase):
                 type="Income",
                 created_at="2024-01-10",
                 year_month_reference="2024-01",
+                user=user,
             )
 
         for _ in range(2):
@@ -37,6 +52,7 @@ class TransactionListCreateViewTest(APITestCase):
                 created_at=f"2024-02-10",
                 year_month_reference=f"2024-02",
                 tag=tag2,
+                user=user,
             )
 
         for _ in range(2):
@@ -48,6 +64,7 @@ class TransactionListCreateViewTest(APITestCase):
                 created_at="2024-02-10",
                 year_month_reference="2024-02",
                 tag=tag1,
+                user=user,
             )
 
     def test_income_transaction_creation_success(self):
