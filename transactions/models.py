@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class TransactionType(models.TextChoices):
@@ -32,5 +33,9 @@ class Transaction(models.Model):
     year_month_reference = models.CharField(max_length=7)
 
     tag = models.ForeignKey(
-        "tags.Tag", models.SET_NULL, related_name="transactions", null=True
+        "tags.Tag", on_delete=models.SET_NULL, related_name="transactions", null=True
+    )
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="transactions", default=1
     )
