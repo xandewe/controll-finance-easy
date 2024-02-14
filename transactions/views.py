@@ -4,6 +4,9 @@ from .serializers import TransactionSerializer
 from .models import Transaction
 from django_filters import rest_framework as filters
 from django.shortcuts import get_object_or_404
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrSuperUser
 
 
 class CustomDateFilter(filters.DateFilter):
@@ -30,10 +33,24 @@ class TransactionFilter(filters.FilterSet):
 
 
 class TransactionView(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsOwnerOrSuperUser]
+
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = TransactionFilter
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return Transaction.objects.all()
+        else:
+            return Transaction.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
