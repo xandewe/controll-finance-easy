@@ -127,3 +127,29 @@ class UserViewTest(APITestCase):
 
         for key, _ in response.json().items():
             self.assertIn(key, keys_expected)
+
+    def test_login_failed(self):
+        URL = reverse("user-login")
+
+        user, _ = create_user_with_token()
+
+        data_login = {
+            "username": user.username,
+            "password": "cassio",
+        }
+
+        response = self.client.post(URL, data_login, format="json")
+
+        expected_status_code = status.HTTP_401_UNAUTHORIZED
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {
+            'detail': 'No active account found with the given credentials'
+        }
+
+        msg = f"Verifique se as informações de retorno de transações estão de acordo"
+
+        self.assertEqual(expected_data, response.json(), msg)
