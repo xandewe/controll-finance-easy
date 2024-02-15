@@ -97,10 +97,33 @@ class UserViewTest(APITestCase):
         self.assertEqual(expected_status_code, response.status_code, msg)
 
         expected_data = {
-            'username': ['This field is required.'],
-            'password': ['This field is required.'],
+            "username": ["This field is required."],
+            "password": ["This field is required."],
         }
 
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
 
         self.assertEqual(expected_data, response.json(), msg)
+
+    def test_login_success(self):
+        URL = reverse("user-login")
+
+        user, _ = create_user_with_token()
+
+        data_login = {
+            "username": user.username,
+            "password": "cassio123",
+        }
+
+        response = self.client.post(URL, data_login, format="json")
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        keys_expected = ("refresh", "access")
+
+        for key, _ in response.json().items():
+            self.assertIn(key, keys_expected)
