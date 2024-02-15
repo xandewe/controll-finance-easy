@@ -146,9 +146,7 @@ class UserViewTest(APITestCase):
 
         self.assertEqual(expected_status_code, response.status_code, msg)
 
-        expected_data = {
-            'detail': 'No active account found with the given credentials'
-        }
+        expected_data = {"detail": "No active account found with the given credentials"}
 
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
 
