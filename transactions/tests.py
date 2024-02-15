@@ -421,6 +421,9 @@ class TransactionDetailViewTest(APITestCase):
     """
     Classe desenvolvida para testar a busca por id, deleção e atualização de transações
     """
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token()
 
     def setUp(self):
         fake = Faker()
@@ -434,6 +437,7 @@ class TransactionDetailViewTest(APITestCase):
                 status="Done",
                 type="Income",
                 created_at=date,
+                user=self.user
             )
 
         for _ in range(2):
@@ -445,6 +449,7 @@ class TransactionDetailViewTest(APITestCase):
                 status="Done",
                 type="Income",
                 created_at=date,
+                user=self.user
             )
 
     def test_get_transaction_by_id_success(self):
@@ -454,10 +459,12 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
+            user=self.user
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL)
 
         expected_status_code = status.HTTP_200_OK
@@ -484,6 +491,7 @@ class TransactionDetailViewTest(APITestCase):
     def test_get_transaction_by_id_invalid(self):
         URL = reverse("transaction-detail", kwargs={"pk": 100})
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL)
 
         expected_status_code = status.HTTP_404_NOT_FOUND
@@ -505,10 +513,12 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
+            user=self.user
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.delete(URL)
 
         expected_status_code = status.HTTP_204_NO_CONTENT
@@ -526,6 +536,7 @@ class TransactionDetailViewTest(APITestCase):
     def test_delete_transaction_by_id_invalid(self):
         URL = reverse("transaction-detail", kwargs={"pk": 100})
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.delete(URL)
 
         expected_status_code = status.HTTP_404_NOT_FOUND
@@ -547,6 +558,7 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
+            user=self.user
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
@@ -557,6 +569,7 @@ class TransactionDetailViewTest(APITestCase):
             "value": 1300.50,
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.patch(URL, transaction_data, format="json")
 
         expected_data = {
@@ -583,6 +596,7 @@ class TransactionDetailViewTest(APITestCase):
     def test_update_transaction_by_id_invalid(self):
         URL = reverse("transaction-detail", kwargs={"pk": 100})
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.patch(URL)
 
         expected_status_code = status.HTTP_404_NOT_FOUND
