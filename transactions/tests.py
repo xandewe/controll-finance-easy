@@ -5,10 +5,7 @@ from faker import Faker
 from .models import Transaction
 from tags.models import Tag
 import random
-from django.contrib.auth.models import User as UserType
-from django.contrib.auth import get_user_model
-
-User: UserType = get_user_model()
+from users.tests import create_user_with_token
 
 
 class TransactionListCreateViewTest(APITestCase):
@@ -16,18 +13,12 @@ class TransactionListCreateViewTest(APITestCase):
     Classe desenvolvida para testar criação e listagem de transações
     """
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token()
+
     def setUp(self):
         fake = Faker()
-
-        default_user_data = {
-            "username": "socrates",
-            "email": fake.unique.email(),
-            "first_name": fake.first_name(),
-            "last_name": fake.last_name(),
-            "password": "socrates123",
-        }
-
-        user = User.objects.create_user(**default_user_data)
 
         tag1 = Tag.objects.create(tag_name="Alimentacao", sub_tag_name="ifood")
         tag2 = Tag.objects.create(tag_name="Saude", sub_tag_name="academia")
@@ -40,7 +31,7 @@ class TransactionListCreateViewTest(APITestCase):
                 type="Income",
                 created_at="2024-01-10",
                 year_month_reference="2024-01",
-                user=user,
+                user=self.user,
             )
 
         for _ in range(2):
@@ -52,7 +43,7 @@ class TransactionListCreateViewTest(APITestCase):
                 created_at=f"2024-02-10",
                 year_month_reference=f"2024-02",
                 tag=tag2,
-                user=user,
+                user=self.user,
             )
 
         for _ in range(2):
@@ -64,7 +55,7 @@ class TransactionListCreateViewTest(APITestCase):
                 created_at="2024-02-10",
                 year_month_reference="2024-02",
                 tag=tag1,
-                user=user,
+                user=self.user,
             )
 
     def test_income_transaction_creation_success(self):
@@ -80,8 +71,9 @@ class TransactionListCreateViewTest(APITestCase):
             "year_month_reference": "2023-01",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
-
+ 
         expected_data = {
             "id": 7,
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
@@ -116,6 +108,7 @@ class TransactionListCreateViewTest(APITestCase):
             "year_month_reference": "2023",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
@@ -137,6 +130,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_creation_without_required_fields(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, data={}, format="json")
 
         expected_data = {
@@ -170,7 +164,8 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
             "year_month_reference": "2023-01",
         }
-
+        
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
@@ -201,6 +196,7 @@ class TransactionListCreateViewTest(APITestCase):
             "year_month_reference": "2023-01",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
@@ -231,6 +227,7 @@ class TransactionListCreateViewTest(APITestCase):
             "year_month_reference": "2023-01",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
@@ -250,6 +247,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL)
 
         expected_status_code = status.HTTP_200_OK
@@ -292,6 +290,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list_filtered_with_type(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL, QUERY_STRING="type=Expense")
 
         expected_status_code = status.HTTP_200_OK
@@ -317,6 +316,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list_filtered_with_status(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL, QUERY_STRING="status=Done")
 
         expected_status_code = status.HTTP_200_OK
@@ -342,6 +342,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list_filtered_with_year_month(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL, QUERY_STRING="year_month=2024-02")
 
         expected_status_code = status.HTTP_200_OK
@@ -366,6 +367,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list_filtered_with_tag_name(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL, QUERY_STRING="tag=Alimentacao")
 
         expected_status_code = status.HTTP_200_OK
@@ -390,6 +392,7 @@ class TransactionListCreateViewTest(APITestCase):
     def test_transaction_list_filtered_with_sub_tag_name(self):
         URL = reverse("transaction-list-create")
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.get(URL, QUERY_STRING="sub_tag=academia")
 
         expected_status_code = status.HTTP_200_OK
