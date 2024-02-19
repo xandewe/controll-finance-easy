@@ -13,3 +13,10 @@ class Card(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="card")
+
+class CreditCardDetail(models.Model):
+    due_date = models.IntegerField()
+    closing_date = models.IntegerField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    card = models.OneToOneField("cards.Card", on_delete=models.SET_NULL, related_name="card_detail")
