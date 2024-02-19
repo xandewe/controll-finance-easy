@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "transactions",
     "tags",
     "users",
+    "cards",
 ]
 
 MIDDLEWARE = [
