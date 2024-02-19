@@ -73,7 +73,7 @@ class TransactionListCreateViewTest(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
- 
+
         expected_data = {
             "id": 7,
             "name": "Transferência Recebida - FULANO - •••.111.111-•• - Easynvest",
@@ -164,7 +164,7 @@ class TransactionListCreateViewTest(APITestCase):
             "created_at": "2023-01-09",
             "year_month_reference": "2023-01",
         }
-        
+
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
@@ -421,6 +421,7 @@ class TransactionDetailViewTest(APITestCase):
     """
     Classe desenvolvida para testar a busca por id, deleção e atualização de transações
     """
+
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user, cls.credencial = create_user_with_token()
@@ -437,7 +438,7 @@ class TransactionDetailViewTest(APITestCase):
                 status="Done",
                 type="Income",
                 created_at=date,
-                user=self.user
+                user=self.user,
             )
 
         for _ in range(2):
@@ -449,7 +450,7 @@ class TransactionDetailViewTest(APITestCase):
                 status="Done",
                 type="Income",
                 created_at=date,
-                user=self.user
+                user=self.user,
             )
 
     def test_get_transaction_by_id_success(self):
@@ -459,7 +460,7 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
-            user=self.user
+            user=self.user,
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
@@ -513,7 +514,7 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
-            user=self.user
+            user=self.user,
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
@@ -558,7 +559,7 @@ class TransactionDetailViewTest(APITestCase):
             status="Done",
             type="Income",
             created_at="2024-01-01",
-            user=self.user
+            user=self.user,
         )
 
         URL = reverse("transaction-detail", kwargs={"pk": transaction.pk})
@@ -606,6 +607,60 @@ class TransactionDetailViewTest(APITestCase):
         self.assertEqual(expected_status_code, response.status_code, msg)
 
         expected_data = {"detail": "Not found."}
+
+        msg = "Verifique se está retornando a mensagem de erro correta"
+
+        self.assertEqual(expected_data, response.json(), msg)
+
+
+class TransactionTagDeleteTest(APITestCase):
+    """
+    Classe desenvolvida para testar deleção de tag de uma determinada transação
+    """
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token()
+
+        cls.tag1 = Tag.objects.create(tag_name="Alimentacao", sub_tag_name="ifood")
+
+    def test_delete_tag_of_transaction(self):
+        transaction = Transaction.objects.create(
+            name=f"Transferência enviada pelo Pix",
+            value="100",
+            status="Done",
+            type="Expense",
+            created_at=f"2024-02-10",
+            year_month_reference=f"2024-02",
+            tag=self.tag1,
+            user=self.user,
+        )
+
+        URL = reverse("transaction-delete-tag", kwargs={"pk": transaction.pk})
+
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
+        response = self.client.delete(URL)
+
+        expected_status_code = status.HTTP_204_NO_CONTENT
+
+        msg = f"Verifique se o status code está conforme o solicitado {expected_status_code}"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        URL_GET = reverse("transaction-detail", kwargs={"pk": transaction.pk})
+
+        response = self.client.get(URL_GET)
+
+        expected_data = {
+            "id": transaction.pk,
+            "description": None,
+            "name":f"Transferência enviada pelo Pix",
+            "value":"100.00",
+            "status":"Done",
+            "type":"Expense",
+            "created_at":f"2024-02-10",
+            "tag": None,
+        }
 
         msg = "Verifique se está retornando a mensagem de erro correta"
 
