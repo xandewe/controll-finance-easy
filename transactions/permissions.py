@@ -4,4 +4,4 @@ from rest_framework.views import Request, View
 
 class IsOwnerOrSuperUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user == obj or request.user.is_superuser
+        return request.user == obj.user or request.user.is_superuser
