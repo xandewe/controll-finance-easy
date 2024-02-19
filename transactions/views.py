@@ -64,6 +64,9 @@ class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class TransactionTagDeleteView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsOwnerOrSuperUser]
+    
     def delete(self, request: Request, pk):
         transaction_queryset = get_object_or_404(Transaction, pk=pk)
 
