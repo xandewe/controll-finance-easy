@@ -11,6 +11,13 @@ class CreditCardDetailSerializer(serializers.ModelSerializer):
 
 class CardSerializer(serializers.ModelSerializer):
     card_detail = CreditCardDetailSerializer()
+
     class Meta:
         model = Card
         fields = ["id", "card_name", "category", "card_detail"]
+
+    def create(self, validated_data):
+        card_detail_data = validated_data.pop("card_detail")
+        card = Card.objects.create(**validated_data)
+        CreditCardDetail.objects.create(card=card, **card_detail_data)
+        return card
