@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class TransactionType(models.TextChoices):
     ACCOUNT = "Account"
-    CREDIT_CARD = "Credit Card"
+    CREDIT_CARD = "Credit"
 
 
 class Card(models.Model):
