@@ -7,4 +7,9 @@ urlpatterns = [
         views.CardView.as_view(),
         name="card-list-create",
     ),
+    path(
+        "cards/<int:pk>/",
+        views.CardDetailView.as_view(),
+        name="card-detail",
+    ),
 ]
