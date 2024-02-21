@@ -23,3 +23,11 @@ class CardView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsOwnerOrSuperUser]
+
+    queryset = Card.objects.all()
+    serializer_class = CardSerializer
