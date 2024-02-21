@@ -20,5 +20,5 @@ class CreditCardDetail(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     card = models.OneToOneField(
-        "cards.Card", on_delete=models.CASCADE, related_name="card_detail"
+        "cards.Card", on_delete=models.CASCADE, related_name="card_detail", null=True
     )
