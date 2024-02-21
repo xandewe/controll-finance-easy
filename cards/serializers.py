@@ -24,3 +24,14 @@ class CardSerializer(serializers.ModelSerializer):
             CreditCardDetail.objects.create(card=card, **card_detail_data)
 
         return card
+    
+    def update(self, instance: Card, validated_data: dict):
+        card_detail_data = validated_data.pop("card_detail", {})
+        instance = super().update(instance, validated_data)
+        
+        if card_detail_data:
+            for attr, value in card_detail_data.items():
+                setattr(instance.card_detail, attr, value)
+            instance.card_detail.save()
+
+        return instance
