@@ -10,6 +10,7 @@ class TransactionType(models.TextChoices):
 class Card(models.Model):
     card_name = models.CharField(max_length=100)
     category = models.CharField(max_length=30, choices=TransactionType.choices)
+    is_active = models.BooleanField(default=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="card")
 
