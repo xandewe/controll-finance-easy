@@ -31,3 +31,7 @@ class CardDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Card.objects.all()
     serializer_class = CardSerializer
+
+    def perform_destroy(self, instance: Card):
+        instance.is_active = False
+        instance.save()
