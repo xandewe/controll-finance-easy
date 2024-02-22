@@ -19,7 +19,7 @@ class CardView(generics.ListCreateAPIView):
         if user.is_superuser:
             return Card.objects.all()
         else:
-            return Card.objects.filter(user=user)
+            return Card.objects.filter(user=user, is_active=True)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
