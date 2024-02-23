@@ -157,6 +157,10 @@ class TagDetailViewTest(APITestCase):
     Classe desenvolvida para testar atualização de tags
     """
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token()
+
     def setUp(self) -> None:
         fake = Faker()
 
@@ -169,6 +173,7 @@ class TagDetailViewTest(APITestCase):
             type="Expense",
             created_at=f"2024-02-10",
             year_month_reference=f"2024-02",
+            user=self.user,
             tag=tag1,
         )
 
