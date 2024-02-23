@@ -115,3 +115,24 @@ class TransactionListCreateViewTest(APITestCase):
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
 
         self.assertEqual(expected_data, response.json(), msg)
+
+    def test_card_creation_without_required_fields(self):
+        URL = reverse("card-list-create")
+
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
+        response = self.client.post(URL, data={}, format="json")
+
+        expected_status_code = status.HTTP_400_BAD_REQUEST
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {
+            "card_name": ["This field is required."],
+            "category": ["This field is required."]
+        }
+
+        msg = f"Verifique se as informações de retorno de transações estão de acordo"
+
+        self.assertEqual(expected_data, response.json(), msg)
