@@ -8,6 +8,9 @@ class TransactionType(models.TextChoices):
 
 
 class Card(models.Model):
+    class Meta:
+        ordering = ["id"]
+
     card_name = models.CharField(max_length=100)
     category = models.CharField(max_length=30, choices=TransactionType.choices)
     is_active = models.BooleanField(default=True)
