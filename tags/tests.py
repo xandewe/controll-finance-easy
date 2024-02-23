@@ -5,6 +5,7 @@ from .models import Tag
 from transactions.models import Transaction
 from faker import Faker
 import random
+from users.tests import create_user_with_token
 
 
 class TagListViewTest(APITestCase):
@@ -55,6 +56,10 @@ class TagCreateViewTest(APITestCase):
     Classe desenvolvida para testar criação de tags
     """
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token()
+
     def setUp(self) -> None:
         fake = Faker()
 
@@ -84,6 +89,7 @@ class TagCreateViewTest(APITestCase):
             "year_month_reference": "2023-01",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, transaction_data, format="json")
 
         expected_data = {
@@ -125,6 +131,7 @@ class TagCreateViewTest(APITestCase):
             "year_month_reference": "2023-01",
         }
 
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, data=transaction_data, format="json")
 
         expected_data = {
