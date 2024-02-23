@@ -70,3 +70,25 @@ class TransactionListCreateViewTest(APITestCase):
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
 
         self.assertEqual(expected_data, response.json(), msg)
+
+    def test_card_creation_without_token(self):
+        URL = reverse("card-list-create")
+
+        card_data = {
+            "card_name": "Nubank",
+            "category": "Account",
+        }
+
+        response = self.client.post(URL, card_data, format="json")
+
+        expected_status_code = status.HTTP_401_UNAUTHORIZED
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {'detail': 'Authentication credentials were not provided.'}
+
+        msg = f"Verifique se as informações de retorno de transações estão de acordo"
+
+        self.assertEqual(expected_data, response.json(), msg)
