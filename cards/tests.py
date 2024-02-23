@@ -9,15 +9,18 @@ from .models import Card, CreditCardDetail
 class TransactionListCreateViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user, cls.credencial = create_user_with_token()
+        cls.user, cls.credencial = create_user_with_token(True)
+        cls.user_common1, cls.user_common1_credential = create_user_with_token(
+            username="neto", password="neto123"
+        )
+        cls.user_common2, cls.user_common2_credential = create_user_with_token(
+            username="ronaldo", password="ronaldo123"
+        )
 
     def setUp(self) -> None:
-        user_common1 = create_user_with_token(username="neto", password="neto123")
-        user_common2 = create_user_with_token(username="ronaldo", password="ronaldo123")
-
         users_list = (
-            user_common1,
-            user_common2,
+            self.user_common1,
+            self.user_common2,
         )
 
         for user in users_list:
@@ -32,13 +35,13 @@ class TransactionListCreateViewTest(APITestCase):
                 "card_name": "Nubank",
                 "category": "Credit",
                 "card_detail": detail,
-                "user": user[0],
+                "user": user,
             }
 
             Card.objects.create(**card_data)
 
         for user in users_list:
-            card_data = {"card_name": "Nubank", "category": "Account", "user": user[0]}
+            card_data = {"card_name": "Nubank", "category": "Account", "user": user}
             Card.objects.create(**card_data)
 
     def test_credit_card_creation_success(self):
@@ -82,7 +85,7 @@ class TransactionListCreateViewTest(APITestCase):
             "card_name": "Nubank",
             "category": "Account",
         }
-        
+
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, card_data, format="json")
 
@@ -168,3 +171,43 @@ class TransactionListCreateViewTest(APITestCase):
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
 
         self.assertEqual(expected_data, response.json(), msg)
+
+    def test_cards_list(self):
+        URL = reverse("card-list-create")
+
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
+        response = self.client.get(URL)
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_pagination_keys = {"count", "next", "previous", "results"}
+        msg = f"Verifique se a paginação está sendo feita corretamente"
+
+        for expected_key in expected_pagination_keys:
+            self.assertIn(expected_key, response.json().keys(), msg)
+
+        results_len = response.json()["count"]
+        expected_len = 4
+
+        msg = "Verifique se a paginação está retornando apenas seis items de cada vez"
+
+        self.assertEqual(expected_len, results_len, msg)
+
+        expected_keys = {
+            "id",
+            "card_name",
+            "category",
+            "card_detail",
+        }
+
+        msg = f"Verifique se o serializer foi configurado para retornar os campos corretamente"
+
+        for key in expected_keys:
+            result_keys = response.json()["results"][0].keys()
+            first_data = result_keys
+
+            self.assertIn(key, first_data, msg)
