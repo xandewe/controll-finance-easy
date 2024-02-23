@@ -10,7 +10,7 @@ User: UserType = get_user_model()
 
 
 def create_user_with_token(
-    user_data: dict = None, is_superuser: bool = False
+    is_superuser: bool = False, **kwargs
 ) -> tuple[UserType, str]:
     """
     Cria um usuário comum e retorna-o juntamente com seu token de acesso JWT.
@@ -19,14 +19,14 @@ def create_user_with_token(
     fake = Faker()
 
     default_user_data = {
-        "username": "cassio",
+        "username": kwargs.get("username", None) or "cassio",
         "email": fake.unique.email(),
         "first_name": fake.first_name(),
         "last_name": fake.last_name(),
-        "password": "cassio123",
+        "password": kwargs.get("password", None) or "cassio123",
     }
 
-    user_data = user_data or default_user_data
+    user_data = default_user_data
 
     if is_superuser:
         user = User.objects.create_superuser(**user_data)
