@@ -2,12 +2,44 @@ from rest_framework.test import APITestCase
 from rest_framework.views import status
 from django.urls import reverse
 from users.tests import create_user_with_token
+import random
+from .models import Card, CreditCardDetail
 
 
 class TransactionListCreateViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user, cls.credencial = create_user_with_token()
+
+    def setUp(self) -> None:
+        user_common1 = create_user_with_token(username="neto", password="neto123")
+        user_common2 = create_user_with_token(username="ronaldo", password="ronaldo123")
+
+        users_list = (
+            user_common1,
+            user_common2,
+        )
+
+        for user in users_list:
+            detail_data = {
+                "due_date": round(random.uniform(1, 30)),
+                "closing_date": round(random.uniform(1, 30)),
+            }
+
+            detail = CreditCardDetail(**detail_data)
+
+            card_data = {
+                "card_name": "Nubank",
+                "category": "Credit",
+                "card_detail": detail,
+                "user": user[0],
+            }
+
+            Card.objects.create(**card_data)
+
+        for user in users_list:
+            card_data = {"card_name": "Nubank", "category": "Account", "user": user[0]}
+            Card.objects.create(**card_data)
 
     def test_credit_card_creation_success(self):
         URL = reverse("card-list-create")
@@ -50,7 +82,7 @@ class TransactionListCreateViewTest(APITestCase):
             "card_name": "Nubank",
             "category": "Account",
         }
-
+        
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
         response = self.client.post(URL, card_data, format="json")
 
@@ -130,7 +162,7 @@ class TransactionListCreateViewTest(APITestCase):
 
         expected_data = {
             "card_name": ["This field is required."],
-            "category": ["This field is required."]
+            "category": ["This field is required."],
         }
 
         msg = f"Verifique se as informações de retorno de transações estão de acordo"
