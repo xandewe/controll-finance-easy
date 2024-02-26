@@ -211,3 +211,46 @@ class CardListCreateViewTest(APITestCase):
             first_data = result_keys
 
             self.assertIn(key, first_data, msg)
+
+
+class CardDetailViewTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user, cls.credencial = create_user_with_token(True)
+        cls.user_common1, cls.user_common1_credential = create_user_with_token(
+            username="neto", password="neto123"
+        )
+        cls.user_common2, cls.user_common2_credential = create_user_with_token(
+            username="ronaldo", password="ronaldo123"
+        )
+
+    def test_get_card_by_id_success(self):
+        card = Card.objects.create(
+            card_name="C6 bank",
+            category="Account",
+            user=self.user_common1,
+        )
+
+        URL = reverse("card-detail", kwargs={"pk": card.pk})
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer " + self.user_common1_credential
+        )
+        response = self.client.get(URL)
+
+        expected_status_code = status.HTTP_200_OK
+
+        msg = f"Verifique se o status code está conforme o solicitado {expected_status_code}"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {
+            "id": card.pk,
+            "card_name": "C6 bank",
+            "category": "Account",
+            "card_detail": None,
+        }
+
+        msg = "Verifique se está retornando o mesmo dado buscado por id"
+
+        self.assertEqual(expected_data, response.json(), msg)
