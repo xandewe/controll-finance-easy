@@ -6,7 +6,7 @@ import random
 from .models import Card, CreditCardDetail
 
 
-class TransactionListCreateViewTest(APITestCase):
+class CardListCreateViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user, cls.credencial = create_user_with_token(True)
