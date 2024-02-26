@@ -254,3 +254,21 @@ class CardDetailViewTest(APITestCase):
         msg = "Verifique se está retornando o mesmo dado buscado por id"
 
         self.assertEqual(expected_data, response.json(), msg)
+
+    def test_get_card_by_id_invalid(self):
+        URL = reverse("card-detail", kwargs={"pk": 100})
+
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.credencial)
+        response = self.client.get(URL)
+
+        expected_status_code = status.HTTP_404_NOT_FOUND
+
+        msg = f"Verifique se o status code está conforme o solicitado {expected_status_code}"
+
+        self.assertEqual(expected_status_code, response.status_code, msg)
+
+        expected_data = {"detail": "Not found."}
+
+        msg = "Verifique se está retornando a mensagem de erro correta"
+
+        self.assertEqual(expected_data, response.json(), msg)
