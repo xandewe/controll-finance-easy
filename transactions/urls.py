@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path(
-        "transactions/",
+        "cards/<int:pk>/transactions/",
         views.TransactionView.as_view(),
         name="transaction-list-create",
     ),
