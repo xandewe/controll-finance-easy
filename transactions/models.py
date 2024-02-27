@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class TransactionType(models.TextChoices):
     INCOME = "Income"
     EXPENSE = "Expense"
-    CREDIT_CARD = "Credit Card"
+    PAYMENT = "Payment"
 
 
 class TransactionStatus(models.TextChoices):
@@ -32,10 +32,10 @@ class Transaction(models.Model):
     created_at = models.DateField()
     year_month_reference = models.CharField(max_length=7)
 
+    card = models.ForeignKey("cards.Card", on_delete=models.CASCADE, related_name="transactions", default=1)
     tag = models.ForeignKey(
         "tags.Tag", on_delete=models.SET_NULL, related_name="transactions", null=True
     )
-
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="transactions", default=1
     )
