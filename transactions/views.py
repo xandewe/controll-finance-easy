@@ -52,7 +52,7 @@ class TransactionView(generics.ListCreateAPIView):
             return Transaction.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user, card_id=self.kwargs['pk'])
 
 
 class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -66,7 +66,7 @@ class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TransactionTagDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrSuperUser]
-    
+
     def delete(self, request: Request, pk):
         transaction_queryset = get_object_or_404(Transaction, pk=pk)
 
