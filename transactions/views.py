@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrSuperUser
+from cards.models import Card
+from cards.exceptions import UserDoesNotContainsCardException
 
 
 class CustomDateFilter(filters.DateFilter):
@@ -52,7 +54,16 @@ class TransactionView(generics.ListCreateAPIView):
             return Transaction.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user, card_id=self.kwargs['pk'])
+        user = self.request.user
+        card_id = self.kwargs['pk']
+
+        card = get_object_or_404(Card, pk=card_id)
+        user_contain_card = user.cards.contains(card)
+
+        if user_contain_card:
+            serializer.save(user=self.request.user, card_id=self.kwargs['pk'])
+        else:
+            raise UserDoesNotContainsCardException()
 
 
 class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
